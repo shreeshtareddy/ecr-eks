@@ -1,0 +1,14 @@
+C:\Users\Administrator\Desktop\docker\CountryCapital\bin\Debug\net7.0\CountryCapital.exe
+C:\Users\Administrator\Desktop\docker\CountryCapital\bin\Debug\net7.0\CountryCapital.deps.json
+C:\Users\Administrator\Desktop\docker\CountryCapital\bin\Debug\net7.0\CountryCapital.runtimeconfig.json
+C:\Users\Administrator\Desktop\docker\CountryCapital\bin\Debug\net7.0\CountryCapital.dll
+C:\Users\Administrator\Desktop\docker\CountryCapital\bin\Debug\net7.0\CountryCapital.pdb
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.AssemblyInfoInputs.cache
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.AssemblyInfo.cs
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.dll
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\refint\CountryCapital.dll
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.pdb
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\CountryCapital.genruntimeconfig.cache
+C:\Users\Administrator\Desktop\docker\CountryCapital\obj\Debug\net7.0\ref\CountryCapital.dll

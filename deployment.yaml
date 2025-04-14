@@ -1,0 +1,35 @@
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capital-finder-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: capital-finder
+  template:
+    metadata:
+      labels:
+        app: capital-finder
+    spec:
+      containers:
+        - name: capital-finder
+          image: 863518441508.dkr.ecr.us-east-1.amazonaws.com/capital-finder-app:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capital-finder-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: capital-finder
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
