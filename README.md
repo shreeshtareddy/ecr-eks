@@ -99,6 +99,12 @@ docker tag capital-finder-app:latest 123456789012.dkr.ecr.us-east-1.amazonaws.co
 docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/capital-finder-app:latest
 ```
 
+
+
+
+![Screenshot 2025-04-15 112332](https://github.com/user-attachments/assets/815c33b6-1837-4593-b730-d1a516f09f33)
+
+
 ---
 
 ## ☁️ Step 3: Create an EKS Cluster
@@ -119,6 +125,15 @@ Verify with:
 ```bash
 kubectl get nodes
 ```
+
+
+
+
+![Screenshot 2025-04-15 112302](https://github.com/user-attachments/assets/0e4b6b1c-a7a0-491e-b495-1551b3fce1cf)
+
+
+
+![Screenshot 2025-04-15 112309](https://github.com/user-attachments/assets/7e8dfc6e-8861-498d-81e0-d781f282340b)
 
 ---
 
