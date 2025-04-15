@@ -1,83 +1,132 @@
 
 
-# Capital Finder App – Deploying a Dockerized .NET App to AWS EKS
+# 🌍 Capital Finder App – Deploying a Dockerized .NET App to AWS EKS
 
-This guide walks you through deploying your Dockerized `.NET` application to Amazon EKS using **ECR**, **kubectl**, and **eksctl**.
+Welcome to the **Capital Finder App** deployment guide! This document will help you containerize your `.NET` application and deploy it to **Amazon Elastic Kubernetes Service (EKS)** using **Amazon Elastic Container Registry (ECR)**.
 
----
-
-## ✅ Prerequisites
-
-Before you begin, ensure the following are installed and configured:
-
-- **AWS CLI** (`aws configure`)
-- **Docker**
-- **kubectl**
-- **eksctl**
-- An AWS IAM user with permissions for **ECR**, **EKS**, and **EC2**
+> 🛠️ By the end of this guide, your app will be deployed to a production-grade Kubernetes cluster on AWS and accessible via a public Load Balancer.
 
 ---
 
-## ✅ Step 1: Create an ECR Repository
+## 📚 Table of Contents
+
+1. [🧰 Prerequisites](#-prerequisites)  
+2. [🐳 Step 1: Dockerize the .NET App](#-step-1-dockerize-the-net-app)  
+3. [📦 Step 2: Push Image to AWS ECR](#-step-2-push-image-to-aws-ecr)  
+4. [☁️ Step 3: Create an EKS Cluster](#️-step-3-create-an-eks-cluster)  
+5. [🚀 Step 4: Deploy App to Kubernetes](#-step-4-deploy-app-to-kubernetes)  
+6. [🌐 Step 5: Access Your Application](#-step-5-access-your-application)  
+7. [🧹 Cleanup](#-cleanup)
+
+---
+
+## 🧰 Prerequisites
+
+Before you start, install and configure the following tools:
+
+| Tool        | Description                          | Install Link |
+|-------------|--------------------------------------|--------------|
+| [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) | AWS Command Line Interface | ✅ |
+| [Docker](https://docs.docker.com/get-docker/)      | Build & run containers      | ✅ |
+| [kubectl](https://kubernetes.io/docs/tasks/tools/) | Manage Kubernetes clusters  | ✅ |
+| [eksctl](https://eksctl.io/introduction/installation/) | Create and manage EKS clusters | ✅ |
+| [.NET SDK](https://dotnet.microsoft.com/en-us/download) | Build the .NET app          | ✅ |
+
+Also:
+
+```bash
+aws configure
+```
+
+Set up your AWS credentials (Access Key, Secret, and default region).
+
+---
+
+## 🐳 Step 1: Dockerize the .NET App
+
+### 📄 1.1 Create a `Dockerfile` in your project root
+
+```Dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "CapitalFinderApp.dll"]
+```
+
+### 🔨 1.2 Build the Docker Image
+
+```bash
+docker build -t capital-finder-app .
+```
+
+---
+
+## 📦 Step 2: Push Image to AWS ECR
+
+### 🧱 2.1 Create an ECR Repository
 
 ```bash
 aws ecr create-repository --repository-name capital-finder-app
+```
 
-
-
-Copy the repositoryUri from the output, e.g.:
-
-
+Copy the `repositoryUri` from the output:
+```
 123456789012.dkr.ecr.us-east-1.amazonaws.com/capital-finder-app
+```
 
+### 🔐 2.2 Authenticate Docker to ECR
 
+```bash
+aws ecr get-login-password --region us-east-1 | \
+docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
+```
 
+### 🏷️ 2.3 Tag & Push Your Image
 
-✅ Step 2: Build and Push Docker Image to ECR
-2.1 Login to ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
-
-
-
-
-Replace 123456789012 with your AWS account ID.
-
-
-
-
-2.2 Build the Docker Image
-docker build -t capital-finder-app .
-
-
-
-
-2.3 Tag the Image for ECR
+```bash
 docker tag capital-finder-app:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/capital-finder-app:latest
 
-
-
-
-2.4 Push the Image to ECR
 docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/capital-finder-app:latest
+```
 
+---
 
+## ☁️ Step 3: Create an EKS Cluster
 
+### ⏳ 3.1 Provision the Cluster (takes ~15 mins)
 
-✅ Step 3: Create an EKS Cluster
-eksctl create cluster --name capital-cluster --region us-east-1 --nodes 2
+```bash
+eksctl create cluster \
+--name capital-cluster \
+--region us-east-1 \
+--nodes 2 \
+--node-type t3.medium \
+--managed
+```
 
+Verify with:
 
+```bash
+kubectl get nodes
+```
 
+---
 
-This will take around 15 minutes. Once complete, kubectl will be configured for your new cluster.
+## 🚀 Step 4: Deploy App to Kubernetes
 
+### 📝 4.1 Create a `deployment.yaml` file
 
-
-
-✅ Step 4: Create Kubernetes Deployment YAML
-Create a file named deployment.yaml and paste the following:
-
-
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -110,33 +159,57 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+```
 
+> ✅ Replace `image:` URI with your actual ECR image URI.
 
+### 🚀 4.2 Apply the Configuration
 
-
-Be sure to replace the image URI with your actual ECR image URL.
-
-
-
-
-✅ Step 5: Deploy to EKS
+```bash
 kubectl apply -f deployment.yaml
+```
 
+Check your resources:
 
-
-
-✅ Step 6: Access Your App
+```bash
+kubectl get pods
 kubectl get svc
+```
 
+---
 
+## 🌐 Step 5: Access Your Application
 
-Look for a line like:
+Run:
 
+```bash
+kubectl get svc capital-finder-service
+```
 
-capital-finder-service   LoadBalancer   <EXTERNAL-IP>   80:...   ...
+Look for the `EXTERNAL-IP` column:
 
+```
+NAME                     TYPE           CLUSTER-IP       EXTERNAL-IP       PORT(S)        AGE
+capital-finder-service   LoadBalancer   10.100.123.45    54.210.89.123     80:32444/TCP   2m
+```
 
+Open your browser:
 
-Once <EXTERNAL-IP> is available, open it in your browser to access your app.
+```
+http://<EXTERNAL-IP>
+```
 
+🎉 **Your .NET app is now live on AWS EKS!**
 
+---
+
+## 🧹 Cleanup
+
+To avoid unnecessary AWS charges, clean up your resources:
+
+```bash
+eksctl delete cluster --name capital-cluster --region us-east-1
+aws ecr delete-repository --repository-name capital-finder-app --force
+```
+
+---
